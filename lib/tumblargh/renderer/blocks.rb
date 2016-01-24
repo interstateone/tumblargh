@@ -69,7 +69,10 @@ module Tumblargh
 
 
 
-      class Video < Photo
+      class Video < Post
+        def should_render?
+          context_post.type == 'video'
+        end
       end
 
 

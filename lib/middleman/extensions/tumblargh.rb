@@ -1,11 +1,10 @@
 require 'rack/tumblargh'
 
 module Middleman
-  module Extensions
     module Tumblargh
-      class << self
+      class Extension < Middleman::Extension
 
-        def registered(app, options={})
+        def initialize(app, options={}, &block)
           ::Tumblargh::API::set_api_key(options[:api_key])
 
           app.after_configuration do
@@ -15,24 +14,21 @@ module Middleman
           end
 
         end
-
-        alias :included :registered
       end
 
     end
-  end
 
   # So, page proxies don't support globs or regex matching anymore, due to how the
   # new Sitemap stuff works (at least as far as I can tell). This is what I came
   # up with as a workaround.
   module Sitemap
     class Store
-      alias_method :orig_find_resource_by_destination_path, :find_resource_by_destination_path
-
       def find_resource_by_destination_path(request_path)
         request_path = "/index.html" if request_path.match(/^\/post\//)
         orig_find_resource_by_destination_path(request_path)
       end
+
+      alias_method :orig_find_resource_by_destination_path, :find_resource_by_destination_path
     end
   end
 
